@@ -1,5 +1,10 @@
 package workspacep;
 import java.util.LinkedList;
+import java.util.List;
+
+import org.neo4j.driver.Session;
+import org.neo4j.driver.Transaction;
+import org.neo4j.driver.TransactionWork;
 
 public class Usuario {
     private String usuario;
@@ -31,6 +36,22 @@ public class Usuario {
     public LinkedList<String> getGuardados() {
         return guardados;
     }
+
+    @Override
+    public LinkedList<String> execute(Transaction tx) {
+         //Result result = tx.run( "MATCH (people:Person) RETURN people.name");
+         Result result = tx.run( "MATCH (u:Usuario) RETURN u.name");
+         LinkedList<String> usuarios = new LinkedList<String>();
+         List<Record> registros = result.list();
+         for (int i = 0; i < registros.size(); i++) {
+             //myactors.add(registros.get(i).toString());
+             usuarios.add(registros.get(i).get("u.name").asString());
+         }
+         
+         return usuarios;
+    }
+
+    
 
     public void addLeidos(String titulo) {
         if (!leidos.contains(titulo)) {
