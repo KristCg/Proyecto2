@@ -37,21 +37,52 @@ public class Usuario {
         return guardados;
     }
 
-    @Override
-    public LinkedList<String> execute(Transaction tx) {
-         //Result result = tx.run( "MATCH (people:Person) RETURN people.name");
-         Result result = tx.run( "MATCH (u:Usuario) RETURN u.name");
-         LinkedList<String> usuarios = new LinkedList<String>();
-         List<Record> registros = result.list();
-         for (int i = 0; i < registros.size(); i++) {
-             //myactors.add(registros.get(i).toString());
-             usuarios.add(registros.get(i).get("u.name").asString());
-         }
-         
-         return usuarios;
+    public boolean IniciarSesion(String username, String password) {
+    
+        try (Session session = driver.session()) {
+            Boolean autenticado = session.readTransaction(tx -> {
+                Result result = tx.run(
+                    "MATCH (u:Usuario {name: $username}) RETURN u.password AS password",
+                    parameters("username", username));
+                
+                if (!result.hasNext()) {
+                    throw new SecurityException("Usuario no encontrado");
+                }
+                
+                Record record = result.next();
+                
+                String dbPassword = record.get("password").asString();
+                
+                if (!dbPassword.equals(password)) {
+                    throw new SecurityException("Contraseña incorrecta");
+                }
+                
+                return true;
+            });
+            
+            return autenticado;
+            
+        } catch (SecurityException e) {
+            throw e;
+        } 
     }
 
-    
+    public static void registrarUsuario(EmbeddedNeo4j db, String name, String password, List<String> generosInteres) {
+        if (db.validar(name)) {
+            throw new IllegalArgumentException("El nombre de usuario ya existe");
+        }
+
+        db.crearUsuario(name, password);
+
+        // Registrar géneros de interés
+        /* for (String genero : generosInteres) {
+            String generoTrimmed = genero.trim();
+            if (!generoTrimmed.isEmpty()) {
+                db.agregarInteresUsuario(nombreUsuario, generoTrimmed);
+            }
+        } */
+    }
+
 
     public void addLeidos(String titulo) {
         if (!leidos.contains(titulo)) {

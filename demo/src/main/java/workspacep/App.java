@@ -1,73 +1,126 @@
 package workspacep;
 
+package proyecto2;
+
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Arrays;
+import java.util.List;
 
-public class App 
-{
+public class App {
     public static void main(String[] args) {
-		
-		//String username = "neo4j";
-		//String password = "densities-feelings-tubes";
-		//String boltURL = "bolt://44.192.99.82:7687";
 
         String username = "javaapp";
-		String password = "Test2025!";
-		String boltURL = "bolt://localhost:7687";
+        String password = "Test2025!";
+        String boltURL = "bolt://localhost:7687";
 
-        System.out.println('1.Iniciar Sesion');
-        System.out.println('2. Registrarse');
-        System.out.println('Opcion: ');
-        Scanner inicio = new Scanner(System.in);
-
-
-
-
-
-
-
-        System.out.println('¿Que deseas hacer?');
-        System.out.println('1. Ver recomendaciones');
-        System.out.println('2. Ver libros guardados');
-        System.out.println('3. Ver libros leidos');
-        System.out.println('4. Agregar libro');
-        System.out.println('Opcion: ');
-        int option = Integer.parseInt(in.nextLine());
-        
-        
-		try ( EmbeddedNeo4j db = new EmbeddedNeo4j( boltURL, username, password ) )
-        {
-            switch(option){
-                catch 1:		 	
-                System.out.println("***Recomendaciones***");
-
-                catch 2: 
-                System.out.println("***Libros guardados***");
-
-                Usuario guardados = Usuario.getGuardados();
-
-                for(String libro: guardados){
-                    System.out.println(libro);
+        try (EmbeddedNeo4j db = new EmbeddedNeo4j(boltURL, username, password);
+             Scanner scanner = new Scanner(System.in)) {
+            
+            while (true) {
+                System.out.println("\n=== SISTEMA DE RECOMENDACIÓN DE LIBROS ===");
+                System.out.println("1. Iniciar Sesión");
+                System.out.println("2. Registrarse");
+                System.out.print("Opción: ");
+                
+                int opcion1;
+                try {
+                    opcion1 = Integer.parseInt(scanner.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Por favor ingrese un número válido.");
+                    continue;
                 }
 
-                catch 3: 
-                System.out.println("***Libros leidos***");
+                switch (opcion1) {
+                    case 1:
+                        EmbeddedNeo4j db = new EmbeddedNeo4j( boltURL, username, password);
+                        System.out.println("\n=== INICIAR SESIÓN ===");
+                        System.out.print("Nombre de usuario: ");
+                        String nombreUsuario = scanner.nextLine();
+                        
+                        System.out.print("Contraseña: ");
+                        String contraseña = scanner.nextLine();
+                
+                        try {
+                            if (db.iniciarSesion(nombreUsuario, contraseña)) {
+                                System.out.println("\n¡Inicio de sesión exitoso!");
+                                menuPrincipal(db, scanner, nombreUsuario);
+                            } else {
+                                System.out.println("Usuario o contraseña incorrectos.");
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error al iniciar sesión: " + e.getMessage());
+                        }
+                        break;
+                    case 2:
+                        EmbeddedNeo4j db = new EmbeddedNeo4j( boltURL, username, password);
+                        System.out.println("\n=== REGISTRO ===");
+                        System.out.print("Nombre de usuario: ");
+                        String nombreUsuario = scanner.nextLine();
+                        
+                        System.out.print("Contraseña: ");
+                        String contraseña = scanner.nextLine();
 
-                Usuario leidos = Usuario.getLeidos();
+                        System.out.println("\nGéneros disponibles:");
+                        List<String> generos = db.getGeneros();
+                        generos.forEach(System.out::println);
+                        
+                        System.out.print("Ingrese sus géneros de interés (separados por comas): ");
+                        String generosInput = scanner.nextLine();
+                        List<String> generosSeleccionados = Arrays.asList(generosInput.split(","));
 
-                for(String libro: leidos){
-                    System.out.println(libro);
+                        try {
+                            Usuario.registrarUsuario(db, nombreUsuario, contraseña, generosSeleccionados);
+                            System.out.println("\n¡Usuario registrado!");
+                        } catch (Exception e) {
+                            System.err.println("Error en el registro: " + e.getMessage());
+                        }
+                        break;
+                    default:
+                        System.out.println("Opción no válida. Intente nuevamente.");
                 }
+            }
+        } catch (Exception e) {
+            System.err.println("Error en la aplicación: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-
-
+    private static void menuPrincipal(EmbeddedNeo4j db, Scanner scanner, String nombreUsuario) {
+        while (true) {
+            System.out.println("\n=== MENÚ PRINCIPAL ===");
+            System.out.println("1. Ver recomendaciones");
+            System.out.println("2. Ver libros guardados");
+            System.out.println("3. Ver libros leídos");
+            System.out.println("4. Agregar libro");
+            System.out.println("5. Cerrar sesión");
+            System.out.print("Opción: ");
+            
+            int opcion;
+            try {
+                opcion = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor ingrese un número válido.");
+                continue;
             }
 
-        	
-        } catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+            switch (opcion) {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    System.out.println("Cerrando sesión...");
+                    return;
+                default:
+                    System.out.println("Opción no válida. Intente nuevamente.");
+            }
+        }
+    }
+
+
 }
