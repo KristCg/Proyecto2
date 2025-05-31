@@ -46,7 +46,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
             }
         }
 
-    public void registarUsuario(String nombreUsuario, String password) {
+    public void registrarUsuario(String nombreUsuario, String password) {
         try (Session session = driver.session()) {
             session.executeWrite(tx -> {
                 tx.run("CREATE (u:Usuario {name: $usuario, password: $password})",
@@ -88,17 +88,18 @@ public class EmbeddedNeo4j implements AutoCloseable{
                     MERGE (a:Autor {nombre: $autor})
                     MERGE (g:Genero {genero: $genero})
                     MERGE (l:Libro {titulo: $titulo, publicacion: $anio})
-                    MERGE (a)-[:Autor_de]->(l)
-                    MERGE (l)-[:genero]->(g)
+                    MERGE (a)-[:Autor_de]->(l)  
+                    MERGE (l)-[:genero]->(g)    
                     WITH l
                     MATCH (u:Usuario {nombre: $usuario})
                     MERGE (u)-[:Leido]->(l)
+                    MERGE (u)-[:Interes_en]->(g)
                     """,
                     parameters("usuario", usuario, "titulo", titulo, "autor", autor, "genero", genero, "anio", anio));
                 tx.commit();
             }
         }
-    }
+}
 
     public void guardarLibro(String usuario, String titulo) {
         try (Session session = driver.session()) {
@@ -207,10 +208,10 @@ public class EmbeddedNeo4j implements AutoCloseable{
     }
 
     //recomendaciones
-    public LinkedList<String> getRecomendacionesAmigos() {
+    public LinkedList<String> getRecomendacionesAmigos(String usuario) {
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
-                return new SistemaDeRecomendaciones().execute(tx);
+                return new SistemaDeRecomendaciones(usuario).execute(tx);
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());

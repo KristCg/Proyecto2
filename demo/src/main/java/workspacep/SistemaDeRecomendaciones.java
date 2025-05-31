@@ -9,24 +9,24 @@ import org.neo4j.driver.Record;
 import static org.neo4j.driver.Values.parameters;
 
 public class SistemaDeRecomendaciones implements TransactionWork<LinkedList<String>> {
-    private String username; 
+    private String usuario; 
 
-    public SistemaDeRecomendaciones(String username) {  
-        this.username = username;
+    public SistemaDeRecomendaciones(String usuario) {  
+        this.usuario = usuario;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUsuario() {
+        return usuario;
     }
 
     @Override
     public LinkedList<String> execute(Transaction tx) {
-        String query = "MATCH (yo:Usuario {name: $username})-[:Amigo]->(amigo:Usuario)-[:leido]->(libro:Libro)\n" +
+        String query = "MATCH (yo:Usuario {name: $usuario})-[:Amigo]->(amigo:Usuario)-[:leido]->(libro:Libro)\n" +
                     "WHERE NOT (yo)-[:leido]->(libro)\n" +
                     "AND NOT (yo)-[:guardado]->(libro)\n" +
                     "RETURN libro.titulo AS titulo";
         
-        Result result = tx.run(query, parameters("username", this.username));
+        Result result = tx.run(query, parameters("usuario", this.usuario));
         
         LinkedList<String> recomendacionAmigos = new LinkedList<>();
         List<Record> registros = result.list();

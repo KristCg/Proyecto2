@@ -18,7 +18,7 @@ public class SistemaDeRecomendacionGenero implements TransactionWork<LinkedList<
     @Override
     public LinkedList<String> execute(Transaction tx) {
         String query =
-            "MATCH (u:Usuario {name: $username})-[:INTERESADO_EN]->(g:Genero)<-[:PERTENECE_A]-(l:Libro) " +
+            "MATCH (u:Usuario {name: $username})-[:Interes_en]->(g:Genero)<-[:genero]-(l:Libro) " +
             "WHERE NOT (u)-[:leido]->(l) " +
             "AND NOT (u)-[:guardado]->(l) " +
             "RETURN DISTINCT l.titulo AS titulo";
