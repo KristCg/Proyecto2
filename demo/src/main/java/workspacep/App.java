@@ -86,7 +86,7 @@ public class App {
         int op2;
         op2 = 0; // Inicializar la opción del menú principal
         System.out.println("\n¡Bienvenido " + nombreUsuario + "!");
-        while (op2 != 4) {
+        while (op2 != 5) {
             System.out.println("\n=== MENÚ PRINCIPAL ===");
             System.out.println("1. Pagina principal");
             System.out.println("2. Biblioteca");

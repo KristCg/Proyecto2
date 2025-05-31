@@ -38,4 +38,3 @@ public class SistemaDeRecomendaciones implements TransactionWork<LinkedList<Stri
         return recomendacionAmigos;
     }
 }
-    }

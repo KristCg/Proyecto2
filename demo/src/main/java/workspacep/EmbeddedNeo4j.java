@@ -35,8 +35,6 @@ public class EmbeddedNeo4j implements AutoCloseable{
         driver.close();
     }
 
-    
-
     public boolean validarUsuario(String name) {
             try (Session session = driver.session()) {
                 return session.executeRead(tx -> {
@@ -158,7 +156,6 @@ public class EmbeddedNeo4j implements AutoCloseable{
     return leidos;
 }
 
-
     public List<String> obtenerLibrosGuardados(String usuario) {
         List<String> guardados = new LinkedList<>();
         try (Session session = driver.session()) {
@@ -187,7 +184,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
                     """,
                     parameters("usuario", usuario));
                 while (result.hasNext()) {
-                    guardados.add(result.next().get("amigo").asString());
+                    amigos.add(result.next().get("amigo").asString());
                 }
                 tx.commit();
             }
