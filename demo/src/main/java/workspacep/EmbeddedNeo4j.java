@@ -174,4 +174,16 @@ public class EmbeddedNeo4j implements AutoCloseable{
         }
         return guardados;
     }
+
+    //recomendaciones
+    public LinkedList<String> getRecomendaciones(){
+        try (Session session = driver.session()){
+            LinkedList<String> recomendacionAmigos = (new SistemaDeRecomendaciones()).execute(session.beginTransaction());
+            return recomendacionAmigos;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+    }
 }

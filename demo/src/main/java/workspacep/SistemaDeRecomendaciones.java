@@ -8,11 +8,10 @@ import org.neo4j.driver.Result;
 import org.neo4j.driver.Record;
 
 public class SistemaDeRecomendaciones implements TransactionWork<LinkedList<String>> {
-    private String user;
+    private String username; 
 
-    public User(String username) {
-        this.user = user;
-
+    public SistemaDeRecomendaciones(String username) {  
+        this.username = username;
     }
 
     public String getUsername() {
@@ -21,17 +20,20 @@ public class SistemaDeRecomendaciones implements TransactionWork<LinkedList<Stri
 
     @Override
     public LinkedList<String> execute(Transaction tx) {
-         //Result result = tx.run( "MATCH (people:Person) RETURN people.name");
-         Result result = tx.run( "MATCH (movie:Movie) RETURN movie.title");
-         LinkedList<String> myMovies = new LinkedList<String>();
-         List<Record> registros = result.list();
-         for (int i = 0; i < registros.size(); i++) {
-             //myactors.add(registros.get(i).toString());
-             myMovies.add(registros.get(i).get("movie.title").asString());
-         }
-         
-         return myMovies;
+        String query = "MATCH (yo:Usuario {name: $username})-[:Amigo]->(amigo:Usuario)-[:leido]->(libro:Libro)\n" +
+                      "WHERE NOT (yo)-[:leido]->(libro)\n" +
+                      "AND NOT (yo)-[:guardado]->(libro)\n" +
+                      "RETURN libro.titulo AS titulo";
+        
+        Result result = tx.run(query, parameters("username", this.username));
+        
+        LinkedList<String> recomendacionAmigos = new LinkedList<>();
+        List<Record> registros = result.list();
+        
+        for (Record registro : registros) {  
+            recomendacionAmigos.add(registro.get("titulo").asString());  
+        }
+        
+        return recomendacionAmigos;
     }
-
-
 }
