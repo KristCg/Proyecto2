@@ -3,12 +3,9 @@ package workspacep;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
-import org.neo4j.driver.TransactionWork;
-import org.neo4j.driver.summary.ResultSummary;
 
 import static org.neo4j.driver.Values.parameters;
 
@@ -28,15 +25,21 @@ public class EmbeddedNeo4j implements AutoCloseable{
         driver = GraphDatabase.driver( uri, AuthTokens.basic( user, password ) );
     }
 
+    public Driver getDriver() {
+        return driver;
+    }
+
     @Override
     public void close() throws Exception
     {
         driver.close();
     }
 
+    
+
     public boolean validarUsuario(String name) {
             try (Session session = driver.session()) {
-                return session.readTransaction(tx -> {
+                return session.executeRead(tx -> {
                     Result result = tx.run(
                         "MATCH (u:Usuario {name: $nombre}) RETURN count(u) > 0",
                         parameters("nombre", name));
@@ -47,7 +50,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
 
     public void registarUsuario(String nombreUsuario, String password) {
         try (Session session = driver.session()) {
-            session.writeTransaction(tx -> {
+            session.executeWrite(tx -> {
                 tx.run("CREATE (u:Usuario {name: $usuario, password: $password})",
                         parameters("usuario", nombreUsuario, "password", password));
                 return null;
@@ -57,11 +60,11 @@ public class EmbeddedNeo4j implements AutoCloseable{
 
     public void agregarInteres(String name, String genero) {
         try (Session session = driver.session()) {
-            session.writeTransaction(tx -> {
+            session.executeWrite(tx -> {
                 tx.run("MATCH (u:Usuario {name: $usuario}) " +
-                      "MERGE (g:Genero {genero: $genero}) " +
-                      "MERGE (u)-[:Interes_en]->(g)",
-                      parameters("usuario", name, "genero", genero));
+                    "MERGE (g:Genero {genero: $genero}) " +
+                    "MERGE (u)-[:Interes_en]->(g)",
+                    parameters("usuario", name, "genero", genero));
                 return null;
             });
         }
@@ -69,7 +72,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
 
     public List<String> getGeneros() {
         try (Session session = driver.session()) {
-            return session.readTransaction(tx -> {
+            return session.executeRead(tx -> {
                 Result result = tx.run("MATCH (g:Genero) RETURN g.genero ORDER BY g.genero");
                 List<String> generos = new ArrayList<>();
                 while (result.hasNext()) {
@@ -137,7 +140,6 @@ public class EmbeddedNeo4j implements AutoCloseable{
     return recomendaciones;
 }
 
-
     public List<String> obtenerLibrosLeidos(String usuario) {
     List<String> leidos = new LinkedList<>();
     try (Session session = driver.session()) {
@@ -176,14 +178,14 @@ public class EmbeddedNeo4j implements AutoCloseable{
     }
 
     //recomendaciones
-    public LinkedList<String> getRecomendaciones(){
-        try (Session session = driver.session()){
-            LinkedList<String> recomendacionAmigos = (new SistemaDeRecomendaciones()).execute(session.beginTransaction());
-            return recomendacionAmigos;
+    public LinkedList<String> getRecomendacionesAmigos() {
+        try (Session session = driver.session()) {
+            try (Transaction tx = session.beginTransaction()) {
+                return new SistemaDeRecomendaciones().execute(tx);
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
+            System.err.println(e.getMessage());
+            return new LinkedList<>();
         }
-
     }
 }
