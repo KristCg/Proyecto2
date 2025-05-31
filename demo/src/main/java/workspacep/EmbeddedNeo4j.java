@@ -113,6 +113,50 @@ public class EmbeddedNeo4j implements AutoCloseable{
         }
     }
 
+    public List<String> obtenerRecomendaciones(String usuario) {
+    List<String> recomendaciones = new ArrayList<>();
+    try (Session session = driver.session()) {
+        try (Transaction tx = session.beginTransaction()) {
+            Result result = tx.run("""
+                MATCH (l:Libro)-[:Genero_A]->(g:Genero)<-[:Genero_A]-(l2:Libro)<-[:Leido]-(u:Usuario)
+                WITH g, COUNT(*) AS popularidad
+                ORDER BY popularidad DESC
+                LIMIT 2
+                MATCH (g)<-[:Genero_A]-(libro:Libro)
+                WHERE NOT EXISTS((:Usuario {nombre: $usuario})-[:Leido]->(libro))
+                RETURN DISTINCT libro.titulo AS recomendacion
+                LIMIT 5
+                """,
+                parameters("usuario", usuario));
+            while (result.hasNext()) {
+                recomendaciones.add(result.next().get("recomendacion").asString());
+            }
+            tx.commit();
+        }
+    }
+    return recomendaciones;
+}
+
+
+    public List<String> obtenerLibrosLeidos(String usuario) {
+    List<String> leidos = new LinkedList<>();
+    try (Session session = driver.session()) {
+        try (Transaction tx = session.beginTransaction()) {
+            Result result = tx.run("""
+                MATCH (u:Usuario {nombre: $usuario})-[:Leido]->(l:Libro)
+                RETURN l.titulo AS titulo
+                """,
+                parameters("usuario", usuario));
+            while (result.hasNext()) {
+                leidos.add(result.next().get("titulo").asString());
+            }
+            tx.commit();
+        }
+    }
+    return leidos;
+}
+
+
     public List<String> obtenerLibrosGuardados(String usuario) {
         List<String> guardados = new LinkedList<>();
         try (Session session = driver.session()) {
@@ -130,10 +174,4 @@ public class EmbeddedNeo4j implements AutoCloseable{
         }
         return guardados;
     }
-
-
-
-    
-
-
 }
