@@ -8,9 +8,9 @@ import java.util.List;
 public class App {
     public static void main(String[] args) {
 
-        String username = "javaapp";
-        String password = "Test2025!";
-        String boltURL = "bolt://localhost:7687";
+        String username = "neo4j";
+        String password = "aSK9BvZ8fAxmFaLZSYaMYk-vSho-AgFkIs4LR6ouFIY";
+        String boltURL = "neo4j+s://c2dfb3cb.databases.neo4j.io";
 
         try (EmbeddedNeo4j db = new EmbeddedNeo4j(boltURL, username, password);
             Scanner scanner = new Scanner(System.in)) {

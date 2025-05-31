@@ -19,7 +19,19 @@ public class SistemaDeRecomendaciones implements TransactionWork<LinkedList<Stri
         return username;
     }
 
-
+    @Override
+    public LinkedList<String> execute(Transaction tx) {
+         //Result result = tx.run( "MATCH (people:Person) RETURN people.name");
+         Result result = tx.run( "MATCH (movie:Movie) RETURN movie.title");
+         LinkedList<String> myMovies = new LinkedList<String>();
+         List<Record> registros = result.list();
+         for (int i = 0; i < registros.size(); i++) {
+             //myactors.add(registros.get(i).toString());
+             myMovies.add(registros.get(i).get("movie.title").asString());
+         }
+         
+         return myMovies;
+    }
 
 
 }
