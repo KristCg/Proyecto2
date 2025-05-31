@@ -3,18 +3,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.neo4j.driver.Session;
-import org.neo4j.driver.Transaction;
-import org.neo4j.driver.TransactionWork;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Record;
+
+import static org.neo4j.driver.Values.parameters;
 
 public class Usuario {
     private String usuario;
     private String password;
     private LinkedList<String> leidos;
-    private LinkedList<String> guardados:
+    private LinkedList<String> guardados;
 
 
-    public User(String username, String password) {
-        this.username = username;
+    public Usuario(String usuario, String password) {
+        this.usuario = usuario;
         this.password = password;
         this.leidos = new LinkedList<>();
         this.guardados = new LinkedList<>();
@@ -22,7 +24,7 @@ public class Usuario {
 
     // Getters y setters
     public String getUsername() {
-        return username;
+        return usuario;
     }
 
     public String getPassword() {
@@ -37,10 +39,9 @@ public class Usuario {
         return guardados;
     }
 
-    public boolean IniciarSesion(String username, String password) {
-    
-        try (Session session = driver.session()) {
-            Boolean autenticado = session.readTransaction(tx -> {
+    public static boolean iniciarSesion(EmbeddedNeo4j db, String username, String password) {
+        try (Session session = db.getDriver().session()) {
+            Boolean autenticado = session.executeRead(tx -> {
                 Result result = tx.run(
                     "MATCH (u:Usuario {name: $username}) RETURN u.password AS password",
                     parameters("username", username));
@@ -64,18 +65,21 @@ public class Usuario {
             
         } catch (SecurityException e) {
             throw e;
-        } 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public static void registrarUsuario(EmbeddedNeo4j db, String name, String password, List<String> generosInteres) {
-        if (db.validar(name)) {
+        if (db.validarUsuario(name)) {
             throw new IllegalArgumentException("El nombre de usuario ya existe");
         }
 
-        db.crearUsuario(name, password);
+        db.registarUsuario(name, password);
 
         for (String genero : generosInteres) {
-            String genero = genero.trim();
+            genero = genero.trim();
             if (!genero.isEmpty()) {
                 db.agregarInteres(name, genero);
             }
