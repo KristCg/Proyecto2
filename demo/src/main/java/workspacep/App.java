@@ -31,7 +31,6 @@ public class App {
 
                 switch (op1) {
                     case 1:
-                        EmbeddedNeo4j db = new EmbeddedNeo4j( boltURL, username, password);
                         System.out.println("\n=== INICIAR SESIÓN ===");
                         System.out.print("Nombre de usuario: ");
                         String nombreUsuario = scanner.nextLine();
@@ -40,7 +39,7 @@ public class App {
                         String contraseña = scanner.nextLine();
                 
                         try {
-                            if (db.IniciarSesion(nombreUsuario, contraseña)) {
+                            if (Usuario.iniciarSesion(db, nombreUsuario, contraseña)) {
                                 System.out.println("\n¡Inicio de sesión exitoso!");
                                 menuPrincipal(db, scanner, nombreUsuario);
                             } else {
@@ -51,13 +50,12 @@ public class App {
                         }
                         break;
                     case 2:
-                        EmbeddedNeo4j db = new EmbeddedNeo4j( boltURL, username, password);
                         System.out.println("\n=== REGISTRO ===");
                         System.out.print("Nombre de usuario: ");
-                        String nombreUsuario = scanner.nextLine();
+                        String nuevoUsuario = scanner.nextLine();
                         
                         System.out.print("Contraseña: ");
-                        String contraseña = scanner.nextLine();
+                        String nuevacontraseña = scanner.nextLine();
 
                         System.out.println("\nGéneros disponibles:");
                         List<String> generos = db.getGeneros();
@@ -68,7 +66,7 @@ public class App {
                         List<String> generosSeleccionados = Arrays.asList(generosInput.split(","));
 
                         try {
-                            Usuario.registrarUsuario(db, nombreUsuario, contraseña, generosSeleccionados);
+                            Usuario.registrarUsuario(db, nuevoUsuario, nuevacontraseña, generosSeleccionados);
                             System.out.println("\n¡Usuario registrado!");
                         } catch (Exception e) {
                             System.err.println("Error en el registro: " + e.getMessage());
@@ -107,7 +105,7 @@ public class App {
                 case 1:
                     System.out.println("\n=== PÁGINA PRINCIPAL ===");
                     System.out.println("Esta son nuestras recomendaciones de libros basadas en tus géneros de interés.");
-                    List<String> recomendaciones = db.getRecomendaciones(nombreUsuario);
+                    List<String> recomendaciones = db.obtenerRecomendaciones(nombreUsuario);
                     if (recomendaciones.isEmpty()) {
                         System.out.println("No hay recomendaciones disponibles.");
                     } else {
@@ -116,7 +114,7 @@ public class App {
                     break;
                 case 2:
                     System.out.println("\n=== BIBLIOTECA ===");
-                    List<String> leidos = db.getLeidos(nombreUsuario);
+                    List<String> leidos = db.obtenerLibrosLeidos(nombreUsuario);
                     if (leidos.isEmpty()) {
                         System.out.println("No has leído ningún libro.");
                     } else {
