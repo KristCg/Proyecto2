@@ -75,12 +75,12 @@ public class Usuario {
         db.crearUsuario(name, password);
 
         // Registrar géneros de interés
-        /* for (String genero : generosInteres) {
+        for (String genero : generosInteres) {
             String generoTrimmed = genero.trim();
             if (!generoTrimmed.isEmpty()) {
                 db.agregarInteresUsuario(nombreUsuario, generoTrimmed);
             }
-        } */
+        } 
     }
 
 
