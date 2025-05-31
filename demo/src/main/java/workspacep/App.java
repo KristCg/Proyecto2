@@ -1,7 +1,5 @@
 package workspacep;
 
-package proyecto2;
-
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Arrays;
