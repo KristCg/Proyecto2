@@ -1,4 +1,5 @@
 package workspacep;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class Usuario {
             throw new IllegalArgumentException("El nombre de usuario ya existe");
         }
 
-        db.registarUsuario(name, password);
+        db.registrarUsuario(name, password);
 
         for (String genero : generosInteres) {
             genero = genero.trim();
