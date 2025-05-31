@@ -55,6 +55,18 @@ public class EmbeddedNeo4j implements AutoCloseable{
         }
     }
 
+    public void agregarInteres(String name, String genero) {
+        try (Session session = driver.session()) {
+            session.writeTransaction(tx -> {
+                tx.run("MATCH (u:Usuario {name: $usuario}) " +
+                      "MERGE (g:Genero {genero: $genero}) " +
+                      "MERGE (u)-[:Interes_en]->(g)",
+                      parameters("usuario", name, "genero", genero));
+                return null;
+            });
+        }
+    }
+
     public List<String> getGeneros() {
         try (Session session = driver.session()) {
             return session.readTransaction(tx -> {
