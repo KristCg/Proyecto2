@@ -90,7 +90,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
                     MERGE (a:Autor {nombre: $autor})
                     MERGE (g:Genero {genero: $genero})
                     MERGE (l:Libro {titulo: $titulo, publicacion: $anio})
-                    MERGE (a)-[:Autor]->(l)
+                    MERGE (a)-[:Autor_de]->(l)
                     MERGE (l)-[:genero]->(g)
                     WITH l
                     MATCH (u:Usuario {nombre: $usuario})
@@ -175,6 +175,38 @@ public class EmbeddedNeo4j implements AutoCloseable{
             }
         }
         return guardados;
+    }
+
+    public List<String> obtenerAmigos(String usuario){
+        List<String> amigos = new LinkedList<>();
+        try (Session session = driver.session()) {
+            try (Transaction tx = session.beginTransaction()) {
+                Result result = tx.run("""
+                    MATCH (u:Usuario {nombre: $usuario})-[:Amigos]->(a:Usuario)
+                    RETURN a.name AS amigo
+                    """,
+                    parameters("usuario", usuario));
+                while (result.hasNext()) {
+                    guardados.add(result.next().get("amigo").asString());
+                }
+                tx.commit();
+            }
+        }
+        return amigos;
+    }
+
+    public void agregarAmigo(String usuario, String a_usuario){
+        try (Session session = driver.session()) {
+            try (Transaction tx = session.beginTransaction()) {
+                tx.run("""
+                    MATCH (u:Usuario {name: $usuario})
+                    MATCH (a:Usuario {name: $ausuario})
+                    MERGE (u)-[:Amigo]->(a)
+                    """,
+                    parameters("usuario", usuario, "ausuario", a_usuario));
+                tx.commit();
+            }
+        }
     }
 
     //recomendaciones

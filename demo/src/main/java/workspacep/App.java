@@ -91,7 +91,8 @@ public class App {
             System.out.println("1. Pagina principal");
             System.out.println("2. Biblioteca");
             System.out.println("3. Agregar libro");
-            System.out.println("4. Cerrar sesión");
+            System.out.println("4. Agregar amigos");
+            System.out.println("5. Cerrar sesión");
             System.out.print("Opción: ");
             
             try {
@@ -153,6 +154,31 @@ public class App {
                         System.err.println("Error al agregar el libro: " + e.getMessage());
                     }
                     break;
+
+                case 4:
+                    System.out.println("\n=== AGREGAR AMIGO ===");
+                    System.out.println("\n-- TUS AMIGOS --");
+                    List<String> amigos = db.obtenerAmigos(nombreUsuario);
+                    if (amigos.isEmpty()) {
+                        System.out.println("Todavia no tienes amigos.");
+                    } else {
+                        amigos.forEach(System.out::println);
+                    }
+                    System.out.println("\n-- AGREGA AMIGOS --");
+                    System.out.print("Nombre de usuario: ");
+                    String a_usuario = scanner.nextLine();
+
+                    if (db.validarUsuario(a_usuario)) {
+                        try {
+                            db.agregarAmigo(nombreUsuario, a_usuario);
+                            System.out.println("Amigo agregado exitosamente.");
+                        } catch (Exception e) {
+                            System.err.println("Error al agregar amigo: " + e.getMessage());
+                        }
+                        break;
+    
+                    }
+
                     
                 case 5:
                     System.out.println("Cerrando sesión...");
