@@ -13,7 +13,7 @@ public class App {
         String boltURL = "bolt://localhost:7687";
 
         try (EmbeddedNeo4j db = new EmbeddedNeo4j(boltURL, username, password);
-             Scanner scanner = new Scanner(System.in)) {
+            Scanner scanner = new Scanner(System.in)) {
             
             while (true) {
                 System.out.println("\n=== SISTEMA DE RECOMENDACIÓN DE LIBROS ===");
@@ -21,15 +21,15 @@ public class App {
                 System.out.println("2. Registrarse");
                 System.out.print("Opción: ");
                 
-                int opcion1;
+                int op1;
                 try {
-                    opcion1 = Integer.parseInt(scanner.nextLine());
+                    op1 = Integer.parseInt(scanner.nextLine());
                 } catch (NumberFormatException e) {
                     System.out.println("Por favor ingrese un número válido.");
                     continue;
                 }
 
-                switch (opcion1) {
+                switch (op1) {
                     case 1:
                         EmbeddedNeo4j db = new EmbeddedNeo4j( boltURL, username, password);
                         System.out.println("\n=== INICIAR SESIÓN ===");
@@ -40,7 +40,7 @@ public class App {
                         String contraseña = scanner.nextLine();
                 
                         try {
-                            if (db.iniciarSesion(nombreUsuario, contraseña)) {
+                            if (db.IniciarSesion(nombreUsuario, contraseña)) {
                                 System.out.println("\n¡Inicio de sesión exitoso!");
                                 menuPrincipal(db, scanner, nombreUsuario);
                             } else {
@@ -85,35 +85,81 @@ public class App {
     }
 
     private static void menuPrincipal(EmbeddedNeo4j db, Scanner scanner, String nombreUsuario) {
-        while (true) {
+        int op2;
+        op2 = 0; // Inicializar la opción del menú principal
+        System.out.println("\n¡Bienvenido " + nombreUsuario + "!");
+        while (op2 != 4) {
             System.out.println("\n=== MENÚ PRINCIPAL ===");
-            System.out.println("1. Ver recomendaciones");
-            System.out.println("2. Ver libros guardados");
-            System.out.println("3. Ver libros leídos");
-            System.out.println("4. Agregar libro");
-            System.out.println("5. Cerrar sesión");
+            System.out.println("1. Pagina principal");
+            System.out.println("2. Biblioteca");
+            System.out.println("3. Agregar libro");
+            System.out.println("4. Cerrar sesión");
             System.out.print("Opción: ");
             
-            int opcion;
             try {
-                opcion = Integer.parseInt(scanner.nextLine());
+                op2 = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Por favor ingrese un número válido.");
                 continue;
             }
 
-            switch (opcion) {
+            switch (op2) {
                 case 1:
+                    System.out.println("\n=== PÁGINA PRINCIPAL ===");
+                    System.out.println("Esta son nuestras recomendaciones de libros basadas en tus géneros de interés.");
+                    List<String> recomendaciones = db.getRecomendaciones(nombreUsuario);
+                    if (recomendaciones.isEmpty()) {
+                        System.out.println("No hay recomendaciones disponibles.");
+                    } else {
+                        recomendaciones.forEach(System.out::println);
+                    }
                     break;
                 case 2:
+                    System.out.println("\n=== BIBLIOTECA ===");
+                    List<String> leidos = db.getLeidos(nombreUsuario);
+                    if (leidos.isEmpty()) {
+                        System.out.println("No has leído ningún libro.");
+                    } else {
+                        System.out.println("Libros leídos:");
+                        leidos.forEach(System.out::println);
+                    }
+                    List<String> guardados = db.obtenerLibrosGuardados(nombreUsuario);
+                    if (guardados.isEmpty()) {
+                        System.out.println("No tienes libros guardados.");
+                    } else {
+                        System.out.println("Libros guardados:");
+                        guardados.forEach(System.out::println);
+                    }
                     break;
+
                 case 3:
+                    System.out.println("\n=== AGREGAR LIBRO ===");
+                    System.out.print("Título del libro: ");
+                    String titulo = scanner.nextLine();
+                    System.out.print("Autor del libro: ");
+                    String autor = scanner.nextLine();
+                    System.out.print("Género del libro: ");
+                    String genero = scanner.nextLine();
+                    System.out.print("Año de publicación: ");
+                    int anio;
+                    try {
+                        anio = Integer.parseInt(scanner.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Por favor ingrese un año válido.");
+                        continue;
+                    }
+                    try {
+                        db.agregarLibro(nombreUsuario, titulo, autor, genero, anio);
+                        System.out.println("Libro agregado exitosamente.");
+                    } catch (Exception e) {
+                        System.err.println("Error al agregar el libro: " + e.getMessage());
+                    }
                     break;
-                case 4:
-                    break;
+                    
                 case 5:
                     System.out.println("Cerrando sesión...");
                     return;
+
                 default:
                     System.out.println("Opción no válida. Intente nuevamente.");
             }
