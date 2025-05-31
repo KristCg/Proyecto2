@@ -91,7 +91,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
                     MERGE (g:Genero {genero: $genero})
                     MERGE (l:Libro {titulo: $titulo, publicacion: $anio})
                     MERGE (a)-[:Autor]->(l)
-                    MERGE (l)-[:Genero_A]->(g)
+                    MERGE (l)-[:genero]->(g)
                     WITH l
                     MATCH (u:Usuario {nombre: $usuario})
                     MERGE (u)-[:Leido]->(l)
@@ -121,11 +121,11 @@ public class EmbeddedNeo4j implements AutoCloseable{
     try (Session session = driver.session()) {
         try (Transaction tx = session.beginTransaction()) {
             Result result = tx.run("""
-                MATCH (l:Libro)-[:Genero_A]->(g:Genero)<-[:Genero_A]-(l2:Libro)<-[:Leido]-(u:Usuario)
+                MATCH (l:Libro)-[:genero]->(g:Genero)<-[:genero]-(l2:Libro)<-[:Leido]-(u:Usuario)
                 WITH g, COUNT(*) AS popularidad
                 ORDER BY popularidad DESC
                 LIMIT 2
-                MATCH (g)<-[:Genero_A]-(libro:Libro)
+                MATCH (g)<-[:genero]-(libro:Libro)
                 WHERE NOT EXISTS((:Usuario {nombre: $usuario})-[:Leido]->(libro))
                 RETURN DISTINCT libro.titulo AS recomendacion
                 LIMIT 5
