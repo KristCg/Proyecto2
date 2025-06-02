@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mis Amigos</title>
+</head>
+<body>
+    <section>
+        <button onclick="location.href='/index'">Inicio</button>
+            <button onclick="location.href='/biblioteca'">Biblioteca</button>
+            <button onclick="location.href='/amigos'">Agregar Amigos</button>
+            <button onclick="location.href='/agregarLibro'">Agregar Libros</button>
+            <button onclick="location.href='/login'">Cerrar Sesión</button>
+    </section>
+
+
+    <h1>Amigos de [[${session.usuario}]]</h1>
+
+    <form action="/amigos" method="post">
+        <input type="text" name="nuevoAmigo" placeholder="Nombre del nuevo amigo" required />
+        <button type="submit">Agregar</button>
+    </form>
+
+    <div th:if="${mensaje}" style="color:green;">[[${mensaje}]]</div>
+    <div th:if="${error}" style="color:red;">[[${error}]]</div>
+
+    <h2>Lista de Amigos:</h2>
+    <ul>
+        <li th:each="amigo : ${amigos}" th:text="${amigo}"></li>
+    </ul>
+</body>
+</html>

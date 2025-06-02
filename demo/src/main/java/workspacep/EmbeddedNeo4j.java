@@ -12,6 +12,7 @@ import static org.neo4j.driver.Values.parameters;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 /**
  * @author Administrator
  *
@@ -35,6 +36,18 @@ public class EmbeddedNeo4j implements AutoCloseable{
         driver.close();
     }
 
+    public boolean iniciarSesion(String usuario, String password) {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                Result result = tx.run("""
+                    MATCH (u:Usuario {name: $usuario, password: $password})
+                    RETURN count(u) > 0
+                    """,
+                    parameters("usuario", usuario, "password", password));
+                return result.single().get(0).asBoolean();
+            });
+        }
+    }
     public boolean validarUsuario(String name) {
             try (Session session = driver.session()) {
                 return session.executeRead(tx -> {
@@ -53,6 +66,14 @@ public class EmbeddedNeo4j implements AutoCloseable{
                         parameters("usuario", nombreUsuario, "password", password));
                 return null;
             });
+        }
+    }
+
+    public boolean usuarioExiste(String usuario) {
+        String query = "MATCH (u:Usuario {nombre: $usuario}) RETURN u LIMIT 1";
+        try (var session = driver.session()) {
+            var result = session.run(query, java.util.Map.of("usuario", usuario));
+            return result.hasNext();
         }
     }
 
@@ -80,8 +101,24 @@ public class EmbeddedNeo4j implements AutoCloseable{
             });
         }
     }
+    public void agregarLibroBiblioteca(String usuario, String titulo) {
+    try (Session session = driver.session()) {
+        session.executeWrite(tx -> {
+            tx.run(
+                "MATCH (u:Usuario {nombre: $usuario}), (l:Libro {titulo: $titulo}) " +
+                "MERGE (u)-[:GUARDO]->(l)",
+                parameters("usuario", usuario, "titulo", titulo)
+            );
+            return null;
+        });
+    }
+}
 
-    public void agregarLibro(String usuario, String titulo, String autor, String genero, int anio) {
+
+    public void agregarLibro(String usuario, String titulo, String autor, String genero, int anio, String imagen) {
+        if (titulo == null || titulo.isEmpty() || autor == null || autor.isEmpty() || genero == null || genero.isEmpty()) {
+            throw new IllegalArgumentException("Título, autor y género son obligatorios.");
+        }
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("""
@@ -116,28 +153,72 @@ public class EmbeddedNeo4j implements AutoCloseable{
     }
 
     public List<String> obtenerRecomendaciones(String usuario) {
-    List<String> recomendaciones = new ArrayList<>();
-    try (Session session = driver.session()) {
-        try (Transaction tx = session.beginTransaction()) {
-            Result result = tx.run("""
-                MATCH (l:Libro)-[:genero]->(g:Genero)<-[:genero]-(l2:Libro)<-[:Leido]-(u:Usuario)
-                WITH g, COUNT(*) AS popularidad
-                ORDER BY popularidad DESC
-                LIMIT 2
-                MATCH (g)<-[:genero]-(libro:Libro)
-                WHERE NOT EXISTS((:Usuario {nombre: $usuario})-[:Leido]->(libro))
-                RETURN DISTINCT libro.titulo AS recomendacion
-                LIMIT 5
-                """,
-                parameters("usuario", usuario));
-            while (result.hasNext()) {
-                recomendaciones.add(result.next().get("recomendacion").asString());
+        List<String> recomendaciones = new ArrayList<>();
+        try (Session session = driver.session()) {
+            try (Transaction tx = session.beginTransaction()) {
+                Result result = tx.run("""
+                    MATCH (l:Libro)-[:genero]->(g:Genero)<-[:genero]-(l2:Libro)<-[:Leido]-(u:Usuario)
+                    WITH g, COUNT(*) AS popularidad
+                    ORDER BY popularidad DESC
+                    LIMIT 2
+                    MATCH (g)<-[:genero]-(libro:Libro)
+                    WHERE NOT EXISTS((:Usuario {nombre: $usuario})-[:Leido]->(libro))
+                    RETURN DISTINCT libro.titulo AS recomendacion
+                    LIMIT 5
+                    """,
+                    parameters("usuario", usuario));
+                while (result.hasNext()) {
+                    recomendaciones.add(result.next().get("recomendacion").asString());
+                }
+                tx.commit();
             }
-            tx.commit();
+        }
+        return recomendaciones;
+    }
+
+    public List<Libro> obtenerLibrosAleatorios(int cantidad) {
+        List<Libro> libros = new ArrayList<>();
+        try (Session session = driver.session()) {
+            try (Transaction tx = session.beginTransaction()) {
+            Result result = tx.run("""
+                            MATCH (l:Libro)
+                            RETURN l.titulo AS titulo, l.autor AS autor, l.aniopublicacion AS anio, l.genero AS genero, l.imagen AS imagen
+                            ORDER BY rand()
+                            LIMIT $cantidad
+                            """, parameters("cantidad", cantidad));
+                            while (result.hasNext()) {
+                                var record = result.next();
+                                libros.add(new Libro(
+                                    record.get("titulo").asString(),
+                                    record.get("autor").asString(),
+                                    record.get("anio").isNull() ? 0 : record.get("anio").asInt(),
+                                    record.get("genero").asString(),
+                                    record.get("imagen").isNull() ? "" : record.get("imagen").asString()
+                                ));
+                        }
+                tx.commit();
+            }
+        }
+        return libros;
+    }
+
+    public List<Libro> obtenerLibrosDeUsuario(String usuario) {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                List<Libro> libros = new ArrayList<>();
+                Result result = tx.run(
+                    "MATCH (u:Usuario {nombre: $usuario})-[:GUARDO]->(l:Libro) RETURN l",
+                    parameters("usuario", usuario)
+                );
+                while (result.hasNext()) {
+                    org.neo4j.driver.Record r = result.next();
+                    libros.add(convertirANodoLibro(r.get("l").asNode()));
+                }
+                return libros;
+            });
         }
     }
-    return recomendaciones;
-}
+
 
     public List<String> obtenerLibrosLeidos(String usuario) {
     List<String> leidos = new LinkedList<>();
@@ -193,6 +274,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
         return amigos;
     }
 
+
     public void agregarAmigo(String usuario, String a_usuario){
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
@@ -217,5 +299,15 @@ public class EmbeddedNeo4j implements AutoCloseable{
             System.err.println(e.getMessage());
             return new LinkedList<>();
         }
+    }
+
+    private Libro convertirANodoLibro(org.neo4j.driver.types.Node nodo) {
+        String titulo = nodo.get("titulo").asString();
+        String autor = nodo.get("autor").asString();
+        int anio = nodo.get("aniopublicacion").asInt();
+        String genero = nodo.get("genero").asString();
+        String imagen = nodo.get("imagen").isNull() ? "" : nodo.get("imagen").asString(); // Si no tiene imagen, deja vacío
+
+        return new Libro(titulo, autor, anio, genero, imagen);
     }
 }

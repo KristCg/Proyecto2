@@ -1,11 +1,21 @@
 package workspacep;
 
-import java.util.LinkedList;
-import java.util.Scanner;
-import java.util.Arrays;
-import java.util.List;
+//import java.util.Scanner;
+//import java.util.Arrays;
+//import java.util.List;
 
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
 public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+}
+
+/* public class App {
     public static void main(String[] args) {
 
         String username = "neo4j";
@@ -192,3 +202,4 @@ public class App {
 
 
 }
+ */

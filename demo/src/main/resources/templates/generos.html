@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Géneros Favoritos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h2>Selecciona tus géneros favoritos</h2>
+
+    <form action="/register/generos" method="post">
+        <div th:each="genero : ${generos}">
+            <label>
+                <input type="checkbox" name="generos" th:value="${genero}">
+                <span th:text="${genero}"></span>
+            </label><br>
+        </div>
+
+        <br>
+        <button type="submit">Finalizar Registro</button>
+    
+    </form>
+
+    <div th:if="${error}" class="error">
+        <p th:text="${error}"></p>
+    </div>
+</body>
+</html>
+

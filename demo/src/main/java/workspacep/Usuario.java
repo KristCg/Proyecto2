@@ -72,22 +72,23 @@ public class Usuario {
         }
     }
 
-    public static void registrarUsuario(EmbeddedNeo4j db, String name, String password, List<String> generosInteres) {
+    public static void registrarUsuario(EmbeddedNeo4j db, String name, String password) {
         if (db.validarUsuario(name)) {
             throw new IllegalArgumentException("El nombre de usuario ya existe");
         }
-
         db.registrarUsuario(name, password);
+    }
 
+    public static void registrarUsuarioGeneros(EmbeddedNeo4j db, String name, String password, List<String> generosInteres) {
+        registrarUsuario(db, name, password); // llama al método anterior
         for (String genero : generosInteres) {
             genero = genero.trim();
             if (!genero.isEmpty()) {
                 db.agregarInteres(name, genero);
             }
-        } 
+        }
     }
-
-
+    
     public void addLeidos(String titulo) {
         if (!leidos.contains(titulo)) {
             if(guardados.contains(titulo)){
