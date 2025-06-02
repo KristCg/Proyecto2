@@ -1,36 +1,58 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Libro</title>
+    <link rel="stylesheet" th:href="@{/libro.css}">
 </head>
 <body>
+    <!-- Menú lateral -->
     <section>
         <button onclick="location.href='/index'">Inicio</button>
-            <button onclick="location.href='/biblioteca'">Biblioteca</button>
-            <button onclick="location.href='/amigos'">Agregar Amigos</button>
-            <button onclick="location.href='/agregarLibro'">Agregar Libros</button>
-            <button onclick="location.href='/login'">Cerrar Sesión</button>
+        <button onclick="location.href='/biblioteca'">Biblioteca</button>
+        <button onclick="location.href='/amigos'">Amigos</button>
+        <button onclick="location.href='/agregarLibro'">Agregar Libro</button>
+        <button onclick="location.href='/login'">Cerrar Sesión</button>
     </section>
 
-    <h1>Agregar un nuevo libro</h1>
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Agregar un nuevo libro</h1>
+        </div>
 
-    <form action="/agregarLibro" method="post">
-        <label>Título:</label><br>
-        <input type="text" name="titulo" required><br><br>
+        <form class="book-form" action="/agregarLibro" method="post">
+            <div class="form-group">
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
 
-        <label>Autor:</label><br>
-        <input type="text" name="autor" required><br><br>
+            <div class="form-group">
+                <label for="autor">Autor:</label>
+                <input type="text" id="autor" name="autor" required>
+            </div>
 
-        <label>Año de publicación:</label><br>
-        <input type="number" name="aniopublicacion" required><br><br>
+            <div class="form-group">
+                <label for="aniopublicacion">Año de publicación:</label>
+                <input type="number" id="aniopublicacion" name="aniopublicacion" required>
+            </div>
 
-        <label>Género:</label><br>
-        <input type="text" name="genero" required><br><br>
+            <div class="form-group">
+                <label for="genero">Género:</label>
+                <input type="text" id="genero" name="genero" required>
+            </div>
 
-        <label>URL de la imagen:</label><br>
-        <input type="text" name="imagen"><br><br>
+            <div class="form-group">
+                <label for="imagen">URL de la imagen (opcional):</label>
+                <input type="text" id="imagen" name="imagen">
+            </div>
 
-        <button type="submit">Agregar libro</button>
-    </form>
+            <div class="form-actions">
+                <button type="reset" class="cancel-btn">Cancelar</button>
+                <button type="submit" class="submit-btn">Agregar libro</button>
+            </div>
+        </form>
+    </main>
 </body>
 </html>
