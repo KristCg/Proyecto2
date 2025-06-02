@@ -1,31 +1,51 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Amigos</title>
+    <link rel="stylesheet" th:href="@{/amigos.css}">
 </head>
 <body>
+    <!-- Menú lateral -->
     <section>
         <button onclick="location.href='/index'">Inicio</button>
-            <button onclick="location.href='/biblioteca'">Biblioteca</button>
-            <button onclick="location.href='/amigos'">Agregar Amigos</button>
-            <button onclick="location.href='/agregarLibro'">Agregar Libros</button>
-            <button onclick="location.href='/login'">Cerrar Sesión</button>
+        <button onclick="location.href='/biblioteca'">Biblioteca</button>
+        <button onclick="location.href='/amigos'">Amigos</button>
+        <button onclick="location.href='/agregarLibro'">Agregar Libro</button>
+        <button onclick="location.href='/login'">Cerrar Sesión</button>
     </section>
 
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Amigos de <span th:text="${session.usuario}"></span></h1>
+        </div>
 
-    <h1>Amigos de [[${session.usuario}]]</h1>
+        <div th:if="${mensaje}" class="message success" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="message error" th:text="${error}"></div>
 
-    <form action="/amigos" method="post">
-        <input type="text" name="nuevoAmigo" placeholder="Nombre del nuevo amigo" required />
-        <button type="submit">Agregar</button>
-    </form>
+        <form class="add-friend-form" action="/amigos" method="post">
+            <div class="form-group">
+                <label for="nuevoAmigo">Agregar nuevo amigo:</label>
+                <input type="text" id="nuevoAmigo" name="nuevoAmigo" placeholder="Nombre de usuario" required>
+            </div>
+            <button type="submit" class="submit-btn">Agregar amigo</button>
+        </form>
 
-    <div th:if="${mensaje}" style="color:green;">[[${mensaje}]]</div>
-    <div th:if="${error}" style="color:red;">[[${error}]]</div>
-
-    <h2>Lista de Amigos:</h2>
-    <ul>
-        <li th:each="amigo : ${amigos}" th:text="${amigo}"></li>
-    </ul>
+        <div class="friends-list">
+            <h2>Lista de Amigos</h2>
+            
+            <div th:if="${amigos.empty}" class="message">
+                <p>Aún no tienes amigos agregados.</p>
+            </div>
+            
+            <div th:unless="${amigos.empty}">
+                <div class="friend-item" th:each="amigo : ${amigos}">
+                    <span th:text="${amigo}"></span>
+                    <button class="remove-btn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>

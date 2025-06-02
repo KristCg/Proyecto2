@@ -2,28 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Géneros Favoritos</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de Géneros</title>
+    <link rel="stylesheet" th:href="@{/generos.css}">
 </head>
 <body>
-    <h2>Selecciona tus géneros favoritos</h2>
-
-    <form action="/register/generos" method="post">
-        <div th:each="genero : ${generos}">
-            <label>
-                <input type="checkbox" name="generos" th:value="${genero}">
-                <span th:text="${genero}"></span>
-            </label><br>
+    <main class="main-content">
+        <div class="genres-card">
+            <h2>Selecciona tus géneros favoritos</h2>
+            
+            <form action="/register/generos" method="post">
+                <div class="genres-grid">
+                    <div class="genre-item" th:each="genero : ${generos}">
+                        <input type="checkbox" id="genre-${genero}" name="generos" th:value="${genero}" class="genre-checkbox">
+                        <label for="genre-${genero}" class="genre-label" th:text="${genero}"></label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">Finalizar Registro</button>
+            </form>
+            
+            <div th:if="${error}" class="error-message">
+                <p th:text="${error}"></p>
+            </div>
         </div>
-
-        <br>
-        <button type="submit">Finalizar Registro</button>
-    
-    </form>
-
-    <div th:if="${error}" class="error">
-        <p th:text="${error}"></p>
-    </div>
+    </main>
 </body>
 </html>
-

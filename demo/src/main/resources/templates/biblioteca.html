@@ -1,32 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Biblioteca</title>
+    <link rel="stylesheet" th:href="@{/biblioteca.css}">
 </head>
 <body>
-    <h1>Mi Biblioteca</h1>
+    <!-- Menú lateral -->
     <section>
         <button onclick="location.href='/index'">Inicio</button>
-            <button onclick="location.href='/biblioteca'">Biblioteca</button>
-            <button onclick="location.href='/amigos'">Agregar Amigos</button>
-            <button onclick="location.href='/agregarLibro'">Agregar Libros</button>
-            <button onclick="location.href='/login'">Cerrar Sesión</button>
+        <button onclick="location.href='/biblioteca'">Biblioteca</button>
+        <button onclick="location.href='/amigos'">Amigos</button>
+        <button onclick="location.href='/agregarLibro'">Agregar Libro</button>
+        <button onclick="location.href='/login'">Cerrar Sesión</button>
     </section>
-    
-    <div th:if="${libros.isEmpty()}">
-        <p>No has agregado libros todavía.</p>
-    </div>
 
-    <div th:unless="${libros.isEmpty()}">
-        <ul>
-            <li th:each="libro : ${libros}">
-                <img th:src="${libro.imagen}" alt="Portada" style="width:100px;height:150px;"><br>
-                <strong th:text="${libro.titulo}"></strong> - 
-                <span th:text="${libro.autor}"></span><br>
-                <em th:text="${libro.genero}"></em> - 
-                <span th:text="${libro.aniopublicacion}"></span>
-            </li>
-        </ul>
-    </div>
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Mi Biblioteca</h1>
+        </div>
+
+        <div class="library-container">
+            <!-- Grid de libros -->
+            <div th:if="${libros.empty}" class="empty-library">
+                <h3>Tu biblioteca está vacía</h3>
+                <p>Aún no has agregado libros a tu biblioteca.</p>
+                <button onclick="location.href='/agregarLibro'" class="submit-btn">Agregar primer libro</button>
+            </div>
+
+            <div th:unless="${libros.empty}" class="books-grid">
+                <div class="book-card" th:each="libro : ${libros}">
+                    <div class="book-cover">
+                        <img th:if="${libro.imagen}" th:src="${libro.imagen}" alt="Portada del libro">
+                        <div th:unless="${libro.imagen}" style="color: #98775d; text-align: center;">
+                            <span>Sin imagen</span>
+                        </div>
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-title" th:text="${libro.titulo}"></h3>
+                        <p class="book-author" th:text="${libro.autor}"></p>
+                        <div class="book-meta">
+                            <span th:text="${libro.genero}"></span>
+                            <span th:text="${libro.aniopublicacion}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
