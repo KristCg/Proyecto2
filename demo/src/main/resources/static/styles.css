@@ -1,5 +1,159 @@
+/* src/main/resources/static/css/style.css */
+
+/* Estilos base */
+:root {
+    --beige-light: #fffbf7;
+    --beige-medium: #f3e9dd;
+    --orange: #e6a20e;
+    --brown-dark: #3c1f12;
+    --brown-light: #98775d;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    margin: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--beige-light);
+    color: var(--brown-dark);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estilos para la sección de navegación */
+section {
+    background-color: var(--brown-dark);
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para botones */
+button {
+    background-color: var(--orange);
+    color: var(--brown-dark);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: var(--brown-light);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenedor principal */
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 2rem;
+}
+
+/* Contenedor de formulario */
+.form-container {
+    background-color: white;
+    border: 1px solid var(--beige-medium);
+    border-radius: 10px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin: 2rem auto;
+}
+
+.form-container h2 {
+    color: var(--brown-dark);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+/* Estilos para formularios */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--brown-dark);
+}
+
+.form-group input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--beige-medium);
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 2px rgba(230, 162, 14, 0.2);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.form-actions button {
+    min-width: 120px;
+}
+
+/* Estilos para mensajes de error */
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    margin-top: 1rem;
+    text-align: center;
+    border: 1px solid #f5c6cb;
+}
+
+/* Estilos para el footer (opcional) */
+footer {
+    background-color: var(--brown-dark);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 1.5rem;
+    }
+    
+    section {
+        flex-wrap: wrap;
+    }
+    
+    button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
 }
