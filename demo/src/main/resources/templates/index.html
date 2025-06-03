@@ -3,28 +3,34 @@
 <head>
     <title>Página Principal</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/index.css}">
 </head>
 <body>
-    <section>
+    <section class="menu-lateral">
         <button onclick="location.href='/index'">Inicio</button>
-            <button onclick="location.href='/biblioteca'">Biblioteca</button>
-            <button onclick="location.href='/amigos'">Agregar Amigos</button>
-            <button onclick="location.href='/agregarLibro'">Agregar Libros</button>
-            <button onclick="location.href='/login'">Cerrar Sesión</button>
-    </section>
-    <h1>Bienvenido [[${usuario}]]</h1>
-    <section class="libros-grid">
-        <div class="libro" th:each="libro : ${libros}">
-            <img th:src="@{/images/{img}(img=${libro.imagen})}" th:alt="${libro.titulo}"
-                th:onclick="'mostrarDetalles(\\'' + ${libro.titulo} + '\\')'">
-            <p th:text="${libro.titulo}"></p>
-            <p th:text="${libro.genero}"></p>
-            <form action="/guardarLibroEnBiblioteca" method="post" style="display:inline;">
-                <input type="hidden" name="titulo" th:value="${libro.titulo}" />
-                <button type="submit">+</button>
-            </form>
-        </div>
+        <button onclick="location.href='/biblioteca'">Biblioteca</button>
+        <button onclick="location.href='/amigos'">Agregar Amigos</button>
+        <button onclick="location.href='/agregarLibro'">Agregar Libros</button>
+        <button onclick="location.href='/login'">Cerrar Sesión</button>
     </section>
 
+    <main class="contenido">
+        <h1>Bienvenido [[${usuario}]]</h1>
+        <h2>Explora nuestra colección de libros e inicia tu nueva lectura.</h2>
+
+        <section class="libros-grid">
+            <div class="libro" th:each="libro : ${libros}">
+                <img th:src="@{/images/{img}(img=${libro.imagen})}" th:alt="${libro.titulo}"
+                    th:onclick="'mostrarDetalles(\\'' + ${libro.titulo} + '\\')'">
+                <p th:text="${libro.titulo}"></p>
+                <p th:text="${libro.genero}"></p>
+                <form action="/guardarLibroEnBiblioteca" method="post" style="display:inline;">
+                    <input type="hidden" name="titulo" th:value="${libro.titulo}" />
+                    <button type="submit">+</button>
+                </form>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

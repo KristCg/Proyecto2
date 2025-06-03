@@ -1,0 +1,117 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fffaf5;
+    display: flex;
+}
+
+.menu-lateral {
+    width: 200px;
+    background-color: #fffaf5;
+    border-right: 2px solid #f3e9dd;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-lateral button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #3c1f12;
+    padding: 10px;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.menu-lateral button:hover {
+    color: #e6a20e;
+    font-weight: bold;
+}
+
+.contenido {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.contenido h1 {
+    font-size: 24px;
+    color: #3c1f12;
+    margin-bottom: 10px;
+}
+
+.contenido h2 {
+    font-size: 18px;
+    color: #6b4c3b;
+    margin-bottom: 30px;
+}
+
+.libros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.libro {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+}
+
+.libro:hover {
+    transform: translateY(-5px);
+}
+
+.libro img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+}
+
+.libro p {
+    margin: 8px 10px 0;
+    font-size: 0.9rem;
+    color: #3c1f12;
+}
+
+.libro p:last-of-type {
+    margin-bottom: 35px;
+    color: #6b4c3b;
+    font-size: 0.8rem;
+}
+
+.libro form button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #e6a20e;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+}
+
+.libro form button:hover {
+    background-color: #c58d0b;
+}
