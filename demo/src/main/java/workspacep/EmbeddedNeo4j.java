@@ -70,7 +70,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
     }
 
     public boolean usuarioExiste(String usuario) {
-        String query = "MATCH (u:Usuario {nombre: $usuario}) RETURN u LIMIT 1";
+        String query = "MATCH (u:Usuario {name: $usuario}) RETURN u LIMIT 1";
         try (var session = driver.session()) {
             var result = session.run(query, java.util.Map.of("usuario", usuario));
             return result.hasNext();
@@ -105,7 +105,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
     try (Session session = driver.session()) {
         session.executeWrite(tx -> {
             tx.run(
-                "MATCH (u:Usuario {nombre: $usuario}), (l:Libro {titulo: $titulo}) " +
+                "MATCH (u:Usuario {name: $usuario}), (l:Libro {titulo: $titulo}) " +
                 "MERGE (u)-[:GUARDO]->(l)",
                 parameters("usuario", usuario, "titulo", titulo)
             );
@@ -115,34 +115,48 @@ public class EmbeddedNeo4j implements AutoCloseable{
 }
 
 
-    public void agregarLibro(String usuario, String titulo, String autor, String genero, int anio, String imagen) {
+    public void agregarLibro(String usuario, String titulo, String autor, String genero, int anio, String descripcion, String imagen) {
         if (titulo == null || titulo.isEmpty() || autor == null || autor.isEmpty() || genero == null || genero.isEmpty()) {
             throw new IllegalArgumentException("Título, autor y género son obligatorios.");
         }
+
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("""
-                    MERGE (a:Autor {nombre: $autor})
+                    MERGE (a:Autor {name: $autor})
                     MERGE (g:Genero {genero: $genero})
-                    MERGE (l:Libro {titulo: $titulo, publicacion: $anio})
-                    MERGE (a)-[:Autor_de]->(l)  
-                    MERGE (l)-[:genero]->(g)    
+                    MERGE (l:Libro {titulo: $titulo})
+                    SET l.publicacion = $anio,
+                        l.autor = $autor,
+                        l.genero = $genero,
+                        l.descripcion = $descripcion,
+                        l.imagen = $imagen
+                    MERGE (a)-[:Autor_de]->(l)
+                    MERGE (l)-[:genero]->(g)
                     WITH l
-                    MATCH (u:Usuario {nombre: $usuario})
+                    MATCH (u:Usuario {name: $usuario})
                     MERGE (u)-[:Leido]->(l)
                     MERGE (u)-[:Interes_en]->(g)
                     """,
-                    parameters("usuario", usuario, "titulo", titulo, "autor", autor, "genero", genero, "anio", anio));
+                    parameters(
+                        "usuario", usuario,
+                        "titulo", titulo,
+                        "autor", autor,
+                        "genero", genero,
+                        "anio", anio,
+                        "descripcion", descripcion,
+                        "imagen", imagen
+                    ));
                 tx.commit();
             }
         }
-}
+    }
 
     public void guardarLibro(String usuario, String titulo) {
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 tx.run("""
-                    MATCH (u:Usuario {nombre: $usuario})
+                    MATCH (u:Usuario {name: $usuario})
                     MATCH (l:Libro {titulo: $titulo})
                     MERGE (u)-[:Guardado]->(l)
                     """,
@@ -162,7 +176,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
                     ORDER BY popularidad DESC
                     LIMIT 2
                     MATCH (g)<-[:genero]-(libro:Libro)
-                    WHERE NOT EXISTS((:Usuario {nombre: $usuario})-[:Leido]->(libro))
+                    WHERE NOT EXISTS((:Usuario {name: $usuario})-[:Leido]->(libro))
                     RETURN DISTINCT libro.titulo AS recomendacion
                     LIMIT 5
                     """,
@@ -207,7 +221,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
             return session.executeRead(tx -> {
                 List<Libro> libros = new ArrayList<>();
                 Result result = tx.run(
-                    "MATCH (u:Usuario {nombre: $usuario})-[:GUARDO]->(l:Libro) RETURN l",
+                    "MATCH (u:Usuario {name: $usuario})-[:GUARDO]->(l:Libro) RETURN l",
                     parameters("usuario", usuario)
                 );
                 while (result.hasNext()) {
@@ -225,7 +239,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
     try (Session session = driver.session()) {
         try (Transaction tx = session.beginTransaction()) {
             Result result = tx.run("""
-                MATCH (u:Usuario {nombre: $usuario})-[:Leido]->(l:Libro)
+                MATCH (u:Usuario {name: $usuario})-[:Leido]->(l:Libro)
                 RETURN l.titulo AS titulo
                 """,
                 parameters("usuario", usuario));
@@ -243,7 +257,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 Result result = tx.run("""
-                    MATCH (u:Usuario {nombre: $usuario})-[:Guardado]->(l:Libro)
+                    MATCH (u:Usuario {name: $usuario})-[:Guardado]->(l:Libro)
                     RETURN l.titulo AS titulo
                     """,
                     parameters("usuario", usuario));
@@ -261,7 +275,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
                 Result result = tx.run("""
-                    MATCH (u:Usuario {nombre: $usuario})-[:Amigos]->(a:Usuario)
+                    MATCH (u:Usuario {name: $usuario})-[:Amigos]->(a:Usuario)
                     RETURN a.name AS amigo
                     """,
                     parameters("usuario", usuario));
@@ -289,7 +303,6 @@ public class EmbeddedNeo4j implements AutoCloseable{
         }
     }
 
-    //recomendaciones
     public LinkedList<String> getRecomendacionesAmigos(String usuario) {
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
@@ -304,9 +317,9 @@ public class EmbeddedNeo4j implements AutoCloseable{
     private Libro convertirANodoLibro(org.neo4j.driver.types.Node nodo) {
         String titulo = nodo.get("titulo").asString();
         String autor = nodo.get("autor").asString();
-        int anio = nodo.get("aniopublicacion").asInt();
+        int anio = nodo.get("aniopublicacion").isNull() ? 0 : nodo.get("aniopublicacion").asInt(); 
         String genero = nodo.get("genero").asString();
-        String imagen = nodo.get("imagen").isNull() ? "" : nodo.get("imagen").asString(); // Si no tiene imagen, deja vacío
+        String imagen = nodo.get("imagen").isNull() ? "" : nodo.get("imagen").asString(); 
 
         return new Libro(titulo, autor, anio, genero, imagen);
     }

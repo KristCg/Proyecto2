@@ -158,20 +158,21 @@ public class Controlador {
     }
 
     @PostMapping("/agregarLibro")
-    public String agregarLibro(
-        @RequestParam String titulo,
-        @RequestParam String autor,
-        @RequestParam int aniopublicacion,
-        @RequestParam String genero,
-        @RequestParam(required = false) String imagen,
+        public String agregarLibro(
+        @RequestParam(name = "titulo") String titulo,
+        @RequestParam(name = "autor") String autor,
+        @RequestParam(name = "genero") String genero,
+        @RequestParam(name = "anio") int anio,
+        @RequestParam(name = "descripcion", required = false, defaultValue = "") String descripcion,
+        @RequestParam(name = "imagen", required = false, defaultValue = "") String imagen,
         HttpSession session,
-        Model model) 
-    {
+        Model model) {
+        
         String usuario = (String) session.getAttribute("usuario");
         if (usuario == null) return "redirect:/login";
 
         try {
-            db.agregarLibro(usuario, titulo, autor, genero, aniopublicacion, imagen);
+            db.agregarLibro(usuario, titulo, autor, genero, anio, descripcion, imagen);
             return "redirect:/biblioteca";
         } catch (Exception e) {
             model.addAttribute("error", "No se pudo agregar el libro: " + e.getMessage());
