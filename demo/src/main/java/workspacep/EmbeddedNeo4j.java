@@ -116,8 +116,8 @@ public class EmbeddedNeo4j implements AutoCloseable{
 
 
     public void agregarLibro(String usuario, String titulo, String autor, String genero, int anio, String descripcion, String imagen) {
-        if (titulo == null || titulo.isEmpty() || autor == null || autor.isEmpty() || genero == null || genero.isEmpty()) {
-            throw new IllegalArgumentException("Título, autor y género son obligatorios.");
+        if (titulo == null || titulo.isEmpty() || autor == null || autor.isEmpty() || genero == null || genero.isEmpty() || descripcion == null || descripcion.isEmpty() || imagen == null || imagen.isEmpty()) {   
+            throw new IllegalArgumentException("Llena todos los campos");
         }
 
         try (Session session = driver.session()) {
@@ -196,7 +196,7 @@ public class EmbeddedNeo4j implements AutoCloseable{
             try (Transaction tx = session.beginTransaction()) {
             Result result = tx.run("""
                             MATCH (l:Libro)
-                            RETURN l.titulo AS titulo, l.autor AS autor, l.aniopublicacion AS anio, l.genero AS genero, l.imagen AS imagen
+                            RETURN l.titulo AS titulo, l.autor AS autor, l.aniopublicacion AS anio, l.genero AS genero, l.imagen AS imagen, l.descripcion AS descripcion
                             ORDER BY rand()
                             LIMIT $cantidad
                             """, parameters("cantidad", cantidad));
@@ -207,7 +207,8 @@ public class EmbeddedNeo4j implements AutoCloseable{
                                     record.get("autor").asString(),
                                     record.get("anio").isNull() ? 0 : record.get("anio").asInt(),
                                     record.get("genero").asString(),
-                                    record.get("imagen").isNull() ? "" : record.get("imagen").asString()
+                                    record.get("imagen").isNull() ? "" : record.get("imagen").asString(),
+                                    record.get("descripcion").isNull() ? "" : record.get("descripcion").asString()
                                 ));
                         }
                 tx.commit();
@@ -317,10 +318,29 @@ public class EmbeddedNeo4j implements AutoCloseable{
     private Libro convertirANodoLibro(org.neo4j.driver.types.Node nodo) {
         String titulo = nodo.get("titulo").asString();
         String autor = nodo.get("autor").asString();
-        int anio = nodo.get("aniopublicacion").isNull() ? 0 : nodo.get("aniopublicacion").asInt(); 
+        int anio = nodo.get("anio").isNull() ? 0 : nodo.get("anio").asInt(); 
         String genero = nodo.get("genero").asString();
         String imagen = nodo.get("imagen").isNull() ? "" : nodo.get("imagen").asString(); 
+        String descripcion = nodo.get("descripcion").isNull() ? "" : nodo.get("descripcion").asString();
 
-        return new Libro(titulo, autor, anio, genero, imagen);
+        return new Libro(titulo, autor, anio, genero, imagen, descripcion);
     }
+
+    public Libro buscarLibroPorTitulo(String titulo) {
+        try (Session session = driver.session()) {
+            return session.executeRead(tx -> {
+                Result result = tx.run("""
+                MATCH (l:Libro)
+                WHERE toLower(trim(l.titulo)) = toLower(trim($titulo))
+                RETURN l
+            """, parameters("titulo", titulo));
+                if (result.hasNext()) {
+                    return convertirANodoLibro(result.next().get("l").asNode());
+                } else {
+                    return null;
+                }
+            });
+        }
+    }
+
 }

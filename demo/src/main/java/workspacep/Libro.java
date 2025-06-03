@@ -3,16 +3,18 @@ package workspacep;
 public class Libro {
     private String titulo;
     private String autor;
-    private int aniopublicacion;
+    private int anio;
     private String genero;
     private String imagen;
+    private String descripcion;
 
-    public Libro(String titulo, String autor, int aniopublicacion, String genero, String imagen) {
+    public Libro(String titulo, String autor, int anio, String genero, String imagen, String descripcion) {
         this.titulo = titulo;
         this.autor = autor;
-        this.aniopublicacion = aniopublicacion;
+        this.anio = anio;
         this.genero = genero;
         this.imagen = imagen;
+        this.descripcion = descripcion;
     }
 
     public String getTitulo() {
@@ -23,8 +25,8 @@ public class Libro {
         return autor;
     }
 
-    public int getAniopublicacion() {
-        return aniopublicacion;
+    public int getAnio() {
+        return anio;
     }
     public String getGenero() {
         return genero;
@@ -32,13 +34,14 @@ public class Libro {
     public String getImagen() {
         return imagen;
     }
+    public String getDescripcion() {
+        return descripcion;
+    }
     
     @Override
     public String toString(){
-        return "Titulo: " + titulo + ", Autor: " + autor + ", Año de Publicación: " + aniopublicacion + ", Género: " + genero+ ", Imagen: " + imagen;
+        return "Titulo: " + titulo + ", Autor: " + autor + ", Año de Publicación: " + anio + ", Género: " + genero+ ", Imagen: " + imagen + ", Descripción: " + descripcion;
 
     }
 
 }
-
-

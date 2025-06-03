@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${libro.titulo}">Detalles del libro</title>
+    <link rel="stylesheet" th:href="@{/detalleLibro.css}">
+</head>
+<body>
+    <div th:if="${error}" class="error">
+        <p th:text="${error}"></p>
+        <button class="back-button" onclick="history.back()">Volver</button>
+    </div>
+    <div class="detalle-container" th:if="${libro != null}">
+    <img th:src="@{'/img/' + ${libro.imagen}}" alt="Portada del libro" />
+    <div class="detalle-info">
+        <h1 th:text="${libro.titulo}"></h1>
+        <h2 th:text="${libro.autor}">Autor</h2>
+        <p><strong>Género:</strong> <span th:text="${libro.genero}"></span></p>
+        <p><strong>Descripción:</strong></p>
+        <p th:text="${libro.descripcion}">Aquí va la descripción</p>
+        <button class="back-button" onclick="history.back()">Volver</button>
+    </div>
+</div>
+</body>
+</html>
+

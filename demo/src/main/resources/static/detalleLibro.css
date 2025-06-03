@@ -1,0 +1,109 @@
+/* detalleLibro.css */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fffbf7;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Contenedor principal */
+.detalle-container {
+    display: flex;
+    max-width: 1000px;
+    background-color: white;
+    border: 1px solid #f3e9dd;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Imagen grande del libro */
+.detalle-container img {
+    width: 400px;
+    height: auto;
+    object-fit: cover;
+    background-color: #f3e9dd;
+}
+
+/* Detalles a la derecha */
+.detalle-info {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.detalle-info h1 {
+    color: #3c1f12;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.detalle-info h2 {
+    color: #98775d;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: normal;
+}
+
+.detalle-info p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.detalle-info strong {
+    color: #3c1f12;
+}
+
+.back-button {
+    margin-top: 20px;
+    align-self: flex-start;
+    background-color: #e6a20e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #c78f0d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .detalle-container {
+        flex-direction: column;
+        width: 90%;
+        height: 90%;
+        max-width: none;
+        max-height: none;
+    }
+
+    .detalle-container img {
+        width: 100%;
+        height: auto;
+    }
+
+    .detalle-info {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex: 1;
+    min-width: 300px;
+    max-width: 600px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+}

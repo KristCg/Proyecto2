@@ -180,6 +180,24 @@ public class Controlador {
         }
     }
 
+    @GetMapping("/detalleLibro/{titulo}")
+    public String verDetalleLibro(@PathVariable("titulo") String titulo, Model model) {
+        try {
+            Libro libro = db.buscarLibroPorTitulo(titulo);
+            if (libro != null) {
+                model.addAttribute("libro", libro);
+                return "detalleLibro";
+            } else {
+                model.addAttribute("error", "Libro no encontrado.");
+                return "detalleLibro";
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Error al cargar el libro: " + e.getMessage());
+            return "detalleLibro";
+        }
+    }
+
+
     @GetMapping("/amigos")
     public String mostrarAmigos(HttpSession session, Model model) {
         String usuario = (String) session.getAttribute("usuario");

@@ -21,8 +21,9 @@
 
         <section class="libros-grid">
             <div class="libro" th:each="libro : ${libros}">
-                <img th:src="@{/images/{img}(img=${libro.imagen})}" th:alt="${libro.titulo}"
-                    th:onclick="'mostrarDetalles(\\'' + ${libro.titulo} + '\\')'">
+                <a th:href="@{'/detalleLibro/' + ${libro.titulo}}">
+                    <img th:src="@{'/img/' + ${libro.imagen}}" th:alt="'Portada de ' + ${libro.titulo}" />
+                </a>
                 <p th:text="${libro.titulo}"></p>
                 <p th:text="${libro.genero}"></p>
                 <form action="/guardarLibroEnBiblioteca" method="post" style="display:inline;">
